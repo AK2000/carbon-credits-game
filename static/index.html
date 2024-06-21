@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Hours and Carbon Credits Game</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Optional: CSS file for styling -->
+</head>
+<body>
+    <div class="container">
+        <h1>Carbon Credits Scheduling Game<span class="eco-icon"></span></h1>
+        <div class="instructions">
+            <h2>Objective</h2>
+            <p>
+                Welcome to the carbon credits scheduling game! You are a computational scientist that has many jobs to run, but need to finish all of the jobs within 60 hours, without using up all of your allocation. 
+                Luckily, you have access to four different machines to run the jobs. Your task is determine which machine to submit each job to in order to obtain the highest "score" within the time and allocation. Happy computing!
+            </p>
+            <h2>How to Play</h2>
+            <p>
+                <ul>
+                    <li>Drag and drop a job into the "task" slot to assign a job to a machine</li>
+                    <li>Hover over a job to view the resources it uses.</li>
+                    <li>Hit the "Advance" button to run assigned jobs and advance the simulation</li>
+                </ul>
+            </p>
+        </div>
+        <div id="game-container">
+            <div id="game-box">
+                <div id="game-info">
+                    <div id="score">Score: <span id="score-value">0</span></div>
+                    <div id="progress-bar-container">
+                        Allocation:
+                        <div id="progress-bar">
+                            <div id="progress-bar-inner"></div>
+                        </div>
+                    </div>
+                    <div id="timer">Time Left: <span id="timer-value">60</span></div>
+                    <div id="advance"><button id="advance-button">Advance</button></div>
+                </div>
+                <div id="game-mechanics">
+                    <div id="task-area">
+                    </div>
+                    <div id="system-area">
+                        <div id="droppable-area" class="droppable">Drop Here!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script> <!-- JavaScript file for functionality -->
+</body>
+</html>

@@ -1,0 +1,247 @@
+/* styles.css */
+/* Reset default margins and paddings */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Basic styling for the container */
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+#game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+}
+
+/* Styling for the title */
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #4CAF50; /* Green color for title */
+}
+
+.eco-icon {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background-image: url('icons/eco-icon.png'); /* Replace with your eco-friendly icon */
+    background-size: cover;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+/* Styling for the instructions pane */
+.instructions {
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: left;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Soft shadow effect */
+}
+
+.instructions h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #4CAF50; /* Green color for instructions title */
+}
+
+.instructions p {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.instructions ul {
+    list-style-type: disc; /* Bullet style */
+    margin-left: 20px; /* Adjust indentation */
+    /* Additional styles for the ul */
+}
+
+.instructions li {
+    margin-bottom: 10px; /* Space between list items */
+    /* Additional styles for the li */
+}
+
+#game-box {
+    width: 800px;
+    padding: 20px;
+    background-color: #e0e0e0;;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#game-info, #game-mechanics {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#game-mechanics {
+    gap: 10px
+}
+
+#score, #progress-bar-container, #timer, #advance {
+    flex: 1;
+    text-align: center;
+    font-weight: bold;
+}
+
+#progress-bar-container {
+    margin-bottom: 10px;
+    flex: 2;
+}
+
+#progress-bar {
+    display: inline-block;
+    width: 50%;
+    height: 20px;
+    background-color: #666;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+#progress-bar-inner {
+    width: 100%;
+    height: 100%;
+    background-color: #4CAF50;
+}
+
+#task-area {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    flex: 1 1 auto;
+
+    overflow: auto;
+    max-height: 200px;
+}
+
+#system-area {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px; /* Adjust the gap size as needed */
+    flex: 2.5 1 auto;
+}
+
+.slot {
+    width: 100%;
+    border: 2px dashed #cccccc;
+    height: 50px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cccccc;
+    position: relative;
+}
+
+.job {
+    display: flex;
+    justify-content: center;
+}
+
+.job-info {
+    width: 100%;
+    display: flex;
+}
+
+.draggable {
+    width: 100%;
+    height: 50px;
+    background-color: #4CAF50;
+    color: white;
+    text-align: center;
+    line-height: 50px;
+    cursor: pointer;
+}
+
+.droppable {
+    padding: 5px;
+    background-color: #f0f0f0;
+    border: 2px solid #000000;
+    cursor: pointer;
+    text-align: center;
+    
+    position: relative;
+}
+
+.info-icon {
+    cursor: pointer;
+    padding: 2px;
+}
+
+.info-container {
+    display: none;
+    position: absolute;
+    background-color: #f0f0f0;
+    padding: 3px;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    color: #000;
+    z-index: 100;
+    min-width: 300px;
+}
+
+.info-object {
+    display: flex;
+    margin: 5px;
+    border: 2px solid #000;
+    width: 90%;
+}
+
+.info-header {
+    padding: 2px;
+    font-weight: bold;
+}
+
+.info-item {
+    padding: 2px;
+}
+
+.resource-icon {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    background-size: cover;
+    vertical-align: middle;
+}
+
+.energy-icon {
+    background-image: url('icons/energy-icon.png'); 
+}
+
+.time-icon {
+    background-image: url('icons/time-icon.png');
+}
+
+.cost-icon {
+    background-image: url('icons/credits-icon.png');
+}
+
+.resource-area {
+    display: flex;
+    justify-content:space-around;
+    align-items: center;
+    margin-bottom: 3px;
+}
+
+#resource-item {
+    flex: 1;
+    text-align: center;
+}
