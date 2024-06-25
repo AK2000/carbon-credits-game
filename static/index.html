@@ -27,15 +27,24 @@
         <div id="game-container">
             <div id="game-box">
                 <div id="game-info">
-                    <div id="score">Score: <span id="score-value">0</span></div>
-                    <div id="progress-bar-container">
+                    <div class="info-element" id="score">Score: <span id="score-value">0</span></div>
+                    <div class="info-element" id="progress-bar-container">
                         Allocation:
                         <div id="progress-bar">
                             <div id="progress-bar-inner"></div>
                         </div>
                     </div>
-                    <div id="timer">Time Left: <span id="timer-value">60</span></div>
-                    <div id="advance"><button id="advance-button">Advance</button></div>
+                    <div class="info-element" id="timer">Time Left: <span id="timer-value">60</span></div>
+                    <div class="info-element" id="energy">Energy Used: <span id="energy-value">60</span></div>
+                    <div class="info-element" id="end-game"><button id="end-game-button">End Game</button></div>
+                </div>
+                <div id="round-info">
+                    <div class="info-element" id="round-header"> Scheduled: </div>
+                    <div class="info-element" id="round-score">Score:<span id="round-score-value">0</span></div>
+                    <div class="info-element" id="round-cost"><span class="resource-icon cost-icon"></span> <span id="round-cost-value">0</span></div>
+                    <div class="info-element" id="round-time"><span class="resource-icon time-icon"></span> <span id="round-time-value">0</span></div>
+                    <div class="info-element" id="round-energy"><span class="resource-icon energy-icon"></span> <span id="round-energy-value">0</span></div>
+                    <div class="info-element" id="advance"><button id="advance-button">Advance</button></div>
                 </div>
                 <div id="game-mechanics">
                     <div id="task-area">

@@ -85,18 +85,25 @@ h1 {
     text-align: center;
 }
 
-#game-info, #game-mechanics {
+#game-info, #round-info, #game-mechanics {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    
 }
 
 #game-mechanics {
+    margin: 10px;
     gap: 10px
 }
 
-#score, #progress-bar-container, #timer, #advance {
+#game-info .info-element {
+    flex: 1;
+    text-align: center;
+    font-weight: bold;
+}
+
+#round-info .info-element {
     flex: 1;
     text-align: center;
     font-weight: bold;
@@ -128,8 +135,9 @@ h1 {
     gap: 10px;
     flex: 1 1 auto;
 
+    height: auto;
     overflow: auto;
-    max-height: 200px;
+    max-height: 300px;
 }
 
 #system-area {
@@ -169,6 +177,8 @@ h1 {
     text-align: center;
     line-height: 50px;
     cursor: pointer;
+    border: 2px solid #4CAF50;
+    transition: border-color 0.3s ease;
 }
 
 .droppable {
@@ -196,6 +206,7 @@ h1 {
     color: #000;
     z-index: 100;
     min-width: 300px;
+    pointer-events:none;
 }
 
 .info-object {
