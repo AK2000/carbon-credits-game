@@ -6,6 +6,7 @@ const endGameButton = document.getElementById('end-game-button')
 const scoreValue = document.getElementById('score-value');
 const progressBar = document.getElementById('progress-bar-inner');
 const timerValue = document.getElementById('timer-value');
+const energyValue = document.getElementById('energy-value');
 
 function generateUniqueId() {
     let array = new Uint32Array(1);
@@ -92,10 +93,10 @@ const dataList = [ // TODO: Generate this list from trace data
 
 // Sample list of data for droppable areas
 const droppableList = {
-    machine1: { id: 'machine1', text: 'Machine 1', current_jobs: new Set()},
-    machine2: { id: 'machine2', text: 'Machine 2', current_jobs: new Set()},
-    machine3: { id: 'machine3', text: 'Machine 3', current_jobs: new Set()},
-    machine4: { id: 'machine4', text: 'Machine 4', current_jobs: new Set()}
+    machine1: { id: 'machine1', text: 'Machine 1', max_power: 200, current_jobs: new Set()},
+    machine2: { id: 'machine2', text: 'Machine 2', max_power: 400, current_jobs: new Set()},
+    machine3: { id: 'machine3', text: 'Machine 3', max_power: 400, current_jobs: new Set()},
+    machine4: { id: 'machine4', text: 'Machine 4', max_power: 300, current_jobs: new Set()}
 };
 
 const Resources = {
@@ -111,6 +112,11 @@ function updateTimer() {
 // Score and progress bar functions
 function updateScore() {
     scoreValue.textContent = game_state.score;
+}
+
+// Score and progress bar functions
+function updateEnergy() {
+    energyValue.textContent = game_state.total_energy;
 }
 
 function updateProgressBar() {
@@ -156,6 +162,7 @@ function updateGameState() {
     updateScore();
     updateProgressBar();
     updateTimer();
+    updateEnergy();
 
     round_state.score = 0;
     document.getElementById('round-score-value').innerText = 0;
@@ -301,7 +308,7 @@ function createDroppableAreas() {
         resource_area.className = 'resource-area';
         Object.entries(Resources).forEach(([key, val]) => {
             const resourceItem = document.createElement('div');
-            resourceItem.className = 'resource-item';
+            resourceItem.classList.add('resource-item', key +"-info");
             const icon = document.createElement('span');
             icon.classList.add("resource-icon", val.iconClass);
             resourceItem.appendChild(icon);
@@ -364,7 +371,7 @@ function createDraggableElement() {
             infoItem.appendChild(icon);
 
             infoItem.innerHTML += ": " + val;
-            infoItem.className = "info-item";
+            infoItem.classList.add("info-item", key + "-info");
             info.appendChild(infoItem);
         });
         infoContainer.appendChild(info);
@@ -391,20 +398,60 @@ function createDraggableElement() {
     draggableElement.addEventListener('dragend', dragEnd);
 }
 
-function costFormula(machine, runtime, energy) {
-    return energy;
+function traditionalCostFormula(machine, runtime, energy) {
+    return runtime;
 }
 
-function calculateCosts() {
+function energyCostFormula(machine, runtime, energy) {
+    return ((droppableList[machine].max_power) * runtime + energy) / 2
+}
+
+function calculateCosts(cost_function) {
     dataList.forEach(item => {
         Object.entries(item.resources).forEach(([machine, resources]) => {
-            const cost = costFormula(machine, resources.runtime, resources.energy);
+            const cost = cost_function(machine, resources.runtime, resources.energy);
             resources.cost = cost;
         });
     });
 }
 
-calculateCosts();
+// Define a variable to hold the function pointer
+let cost_function;
+
+// Get the URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+let version = urlParams.get('version');
+
+// Array of available game versions
+const availableVersions = ['1', '2', '3']; // Add more versions as needed
+
+// If version is not specified or is invalid, choose a random version
+if (!version || !availableVersions.includes(version)) {
+    version = availableVersions[Math.floor(Math.random() * availableVersions.length)];
+}
+
+// Assign the function pointer based on the version
+switch (version) {
+    case '1':
+        const style = document.createElement('style');
+        document.head.appendChild(style);
+        style.sheet.insertRule('.energy-info { display: none; }', 0);
+        cost_function = traditionalCostFormula;
+        break;
+    case '2':
+        cost_function = traditionalCostFormula;
+        break;
+    case '3':
+        cost_function = energyCostFormula;
+        break;
+    default:
+        console.log("An Error ocurred initializing the game!");
+        break;
+}
+
+game_state.version = version;
+
+calculateCosts(cost_function);
 createDroppableAreas();
 createDraggableElement();
 createDraggableElement();
