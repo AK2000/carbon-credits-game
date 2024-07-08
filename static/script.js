@@ -33,63 +33,8 @@ const round_state = {
     energy: 0
 };
 
-const dataList = [ // TODO: Generate this list from trace data
-    { 
-        id: 0, 
-        text: 'Job 1', 
-        score: 10, 
-        resources: {
-            machine1: {runtime: 30, energy: 30},
-            machine2: {runtime: 20, energy: 30},
-            machine3: {runtime: 40, energy: 20},
-            machine4: {runtime: 20, energy: 20},
-        }
-    },
-    { 
-        id: 1, 
-        text: 'Job 2', 
-        score: 20, 
-        resources: {
-            machine1: {runtime: 30, energy: 30},
-            machine2: {runtime: 20, energy: 30},
-            machine3: {runtime: 40, energy: 20},
-            machine4: {runtime: 20, energy: 20},
-        }
-    },
-    { 
-        id: 2, 
-        text: 'Job 3', 
-        score: 10, 
-        resources: {
-            machine1: {runtime: 30, energy: 30},
-            machine2: {runtime: 20, energy: 30},
-            machine3: {runtime: 40, energy: 20},
-            machine4: {runtime: 20, energy: 20},
-        }
-    },
-    { 
-        id: 3, 
-        text: 'Job 4', 
-        score: 10, 
-        resources: {
-            machine1: {runtime: 30, energy: 30},
-            machine2: {runtime: 20, energy: 30},
-            machine3: {runtime: 40, energy: 20},
-            machine4: {runtime: 20, energy: 20},
-        }
-    },
-    { 
-        id: 4, 
-        text: 'Job 5', 
-        score: 10, 
-        resources: {
-            machine1: {runtime: 30, energy: 30},
-            machine2: {runtime: 20, energy: 30},
-            machine3: {runtime: 40, energy: 20},
-            machine4: {runtime: 20, energy: 20},
-        }
-    },
-];
+const dataList = await fetch('./sample_jobs.json')
+    .then((response) => response.json());
 
 // Sample list of data for droppable areas
 const droppableList = {
