@@ -16,9 +16,9 @@ function generateUniqueId() {
 
 const game_state = {
     score: 0,
-    timeLeft: 60,
-    total_allocation: 100,
-    allocation: 100,
+    timeLeft: 200,
+    total_allocation: 200,
+    allocation: 200,
     total_energy: 0,
     total_runtime: 0,
     scheduling_decisions: [],
@@ -37,11 +37,12 @@ const dataList = await fetch('./sample_jobs.json')
     .then((response) => response.json());
 
 // Sample list of data for droppable areas
+// Max Power is TDP for 100 nodes in kW
 const droppableList = {
-    machine1: { id: 'machine1', text: 'Machine 1', max_power: 200, current_jobs: new Set()},
-    machine2: { id: 'machine2', text: 'Machine 2', max_power: 400, current_jobs: new Set()},
-    machine3: { id: 'machine3', text: 'Machine 3', max_power: 400, current_jobs: new Set()},
-    machine4: { id: 'machine4', text: 'Machine 4', max_power: 300, current_jobs: new Set()}
+    machine1: { id: 'machine1', text: 'Machine 1', max_power: 20, current_jobs: new Set()},
+    machine2: { id: 'machine2', text: 'Machine 2', max_power: 40, current_jobs: new Set()},
+    machine3: { id: 'machine3', text: 'Machine 3', max_power: 40, current_jobs: new Set()},
+    machine4: { id: 'machine4', text: 'Machine 4', max_power: 30, current_jobs: new Set()}
 };
 
 const Resources = {
@@ -388,6 +389,8 @@ switch (version) {
         break;
     case '3':
         cost_function = energyCostFormula;
+        game_state.total_allocation = 1400;
+        game_state.allocation = game_state.allocation;
         break;
     default:
         console.log("An Error ocurred initializing the game!");
