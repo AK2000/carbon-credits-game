@@ -5,6 +5,7 @@ const advanceButton = document.getElementById('advance-button');
 const endGameButton = document.getElementById('end-game-button')
 const scoreValue = document.getElementById('score-value');
 const progressBar = document.getElementById('progress-bar-inner');
+const progressBarLabel = document.getElementById('progress-bar-label');
 const timerValue = document.getElementById('timer-value');
 const energyValue = document.getElementById('energy-value');
 
@@ -68,6 +69,7 @@ function updateEnergy() {
 function updateProgressBar() {
     const percent = (game_state.allocation / game_state.total_allocation) * 100; // Example: Update progress bar based on score
     progressBar.style.width = percent + '%';
+    progressBarLabel.innerText = Math.round(game_state.allocation);
 }
 
 function gameOver() {
@@ -97,6 +99,7 @@ function updateGameState() {
             game_state.scheduling_decisions.push(job);
             const job_element = document.getElementById('item-' + job_id);
             job_element.remove();
+            createDraggableElement();
         });
         machine.current_jobs.clear();
 
@@ -390,20 +393,22 @@ switch (version) {
     case '3':
         cost_function = energyCostFormula;
         game_state.total_allocation = 1400;
-        game_state.allocation = game_state.allocation;
+        game_state.allocation = game_state.total_allocation;
         break;
     default:
         console.log("An Error ocurred initializing the game!");
         break;
 }
+updateProgressBar();
 
 game_state.version = version;
 
 calculateCosts(cost_function);
 createDroppableAreas();
-createDraggableElement();
-createDraggableElement();
-let taskInterval = setInterval(createDraggableElement, 10000);
+for(let i = 0; i < 5; i++){
+    createDraggableElement();
+}
+// let taskInterval = setInterval(createDraggableElement, 10000);
 // Add event listeners
 advanceButton.addEventListener('click', advanceButtonClick);
 endGameButton.addEventListener('click', gameOver);

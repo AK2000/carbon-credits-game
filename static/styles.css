@@ -8,7 +8,7 @@
 
 /* Basic styling for the container */
 .container {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 20px auto;
     padding: 20px;
     background-color: #f0f0f0;
@@ -76,7 +76,7 @@ h1 {
 }
 
 #game-box {
-    width: 800px;
+    width: 1000px;
     padding: 20px;
     background-color: #e0e0e0;;
     border: 2px solid #ccc;
@@ -135,9 +135,7 @@ h1 {
     gap: 10px;
     flex: 1 1 auto;
 
-    height: auto;
-    overflow: auto;
-    max-height: 300px;
+    height: 300px;
 }
 
 #system-area {
@@ -179,6 +177,7 @@ h1 {
     cursor: pointer;
     border: 2px solid #4CAF50;
     transition: border-color 0.3s ease;
+    position: relative;
 }
 
 .droppable {
@@ -205,12 +204,13 @@ h1 {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     color: #000;
     z-index: 100;
-    min-width: 300px;
+    min-width: 400px;
     pointer-events:none;
 }
 
 .info-object {
     display: flex;
+    justify-content: space-around;
     margin: 5px;
     border: 2px solid #000;
     width: 90%;
