@@ -137,6 +137,7 @@ function updateGameState() {
             } else {
                 job_element.draggable = false;
                 job_element.classList.add("pinned");
+                job.running = true;
                 Object.entries(Resources).forEach(([key, val]) => {
                     const resourceVal = document.getElementById(machine.id + "-" + key);
                     resourceVal.innerText = Math.round(job.resources[machine.id][key]);
@@ -387,7 +388,9 @@ function createDraggableElement() {
     
     // Add event listeners for hover
     textSpan.addEventListener('mouseover', function(event) {
-        infoContainer.style.display = 'block';
+        if(!dataList[item.id].running){
+            infoContainer.style.display = 'block';
+        }
     });
 
     // textSpan.addEventListener('touchstart', function(event) {
@@ -414,12 +417,13 @@ function energyCostFormula(machine, runtime, energy) {
     return ((droppableList[machine].max_power) * runtime + energy) / 2
 }
 
-function calculateCosts(cost_function) {
+function initializeJobs(cost_function) {
     dataList.forEach(item => {
         Object.entries(item.resources).forEach(([machine, resources]) => {
             const cost = cost_function(machine, resources.runtime, resources.energy);
             resources.cost = cost;
         });
+        item.running = false;
     });
 }
 
@@ -462,7 +466,7 @@ updateProgressBar();
 
 game_state.version = version;
 
-calculateCosts(cost_function);
+initializeJobs(cost_function);
 const taskArea = document.getElementById('task-area');
 taskArea.addEventListener('dragover', dragOver);
 taskArea.addEventListener('drop', dropTaskArea);
