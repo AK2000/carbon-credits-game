@@ -40,10 +40,10 @@ const dataList = await fetch('./sample_jobs.json')
 // Sample list of data for droppable areas
 // Max Power is TDP for 100 nodes in kW
 const droppableList = {
-    machine1: { id: 'machine1', text: 'Machine 1', max_power: 20, current_jobs: new Set()},
-    machine2: { id: 'machine2', text: 'Machine 2', max_power: 40, current_jobs: new Set()},
-    machine3: { id: 'machine3', text: 'Machine 3', max_power: 40, current_jobs: new Set()},
-    machine4: { id: 'machine4', text: 'Machine 4', max_power: 30, current_jobs: new Set()}
+    machine1: { id: 'machine1', text: 'Machine 1', max_power: 20, current_job: null},
+    machine2: { id: 'machine2', text: 'Machine 2', max_power: 40, current_job: null},
+    machine3: { id: 'machine3', text: 'Machine 3', max_power: 40, current_job: null},
+    machine4: { id: 'machine4', text: 'Machine 4', max_power: 30, current_job: null}
 };
 
 const Resources = {
@@ -58,12 +58,12 @@ function updateTimer() {
 
 // Score and progress bar functions
 function updateScore() {
-    scoreValue.textContent = game_state.score;
+    scoreValue.textContent = Math.round(game_state.score);
 }
 
 // Score and progress bar functions
 function updateEnergy() {
-    energyValue.textContent = game_state.total_energy;
+    energyValue.textContent = Math.round(game_state.total_energy);
 }
 
 function updateProgressBar() {
@@ -73,54 +73,88 @@ function updateProgressBar() {
 }
 
 function gameOver() {
-    gameEnded = true;
     advanceButton.disabled = true; // Disable the advance button
     endGameButton.disabled = true;
-    clearInterval(taskInterval);
     sendDataToServer(game_state);
     // Additional game over logic here if needed
     alert('Game Over! Your final score is ' + game_state.score);
 }
 
 function updateGameState() {
+    // Find time to advance
+    let advance_time = 0;
+    Object.values(droppableList).forEach(machine => {
+        if(machine.current_job != null) {
+            const job = dataList[machine.current_job];
+            if(advance_time == 0) {
+                advance_time = job.resources[machine.id].runtime;
+            }
+            advance_time = Math.min(advance_time, job.resources[machine.id].runtime);
+        }
+    });
+    console.log(advance_time);
+
+    // Find allocation and score
+    let allocation_used = 0;
+    let energy_used = 0
+    let score_earned = 0;
+    Object.values(droppableList).forEach(machine => {
+        if(machine.current_job != null) {
+            const job = dataList[machine.current_job];
+            if(advance_time == job.resources[machine.id].runtime){
+                score_earned += job.score;
+            }
+            
+            const job_proportion = advance_time/job.resources[machine.id].runtime;
+            allocation_used += job_proportion * job.resources[machine.id].cost;
+            energy_used += job_proportion * job.resources[machine.id].energy;
+        }
+    });
+
     //TODO: Check if we can run these jobs!!!
-    if(game_state.allocation < round_state.allocation || game_state.timeLeft < round_state.time){
+    if(game_state.allocation < allocation_used || game_state.timeLeft < advance_time){
         return false;
     }
 
-    game_state.score += round_state.score;
-    game_state.allocation -= round_state.allocation;
-    game_state.total_energy += round_state.energy;
-    game_state.timeLeft -= round_state.time;
-
     Object.values(droppableList).forEach(machine => {
-        machine.current_jobs.forEach(job_id => {
-            const job = dataList[job_id];
-            game_state.scheduling_decisions.push(job);
-            const job_element = document.getElementById('item-' + job_id);
-            job_element.remove();
-            createDraggableElement();
-        });
-        machine.current_jobs.clear();
+        if(machine.current_job != null) {
+            const job = dataList[machine.current_job];
+            const job_proportion = advance_time/job.resources[machine.id].runtime;
+            job.resources[machine.id].runtime -= advance_time;
+            job.resources[machine.id].cost = (1-job_proportion) * job.resources[machine.id].cost;
+            job.resources[machine.id].energy = (1-job_proportion) * job.resources[machine.id].energy;
+            game_state.scheduling_decisions.push(job);    
 
-        Object.entries(Resources).forEach(([key, val]) => {
-            const resourceVal = document.getElementById(machine.id + "-" + key);
-            resourceVal.innerText = "" + 0;
-        });
+            const job_element = document.getElementById('item-' + machine.current_job);
+            if(job.resources[machine.id].runtime == 0){
+                job_element.remove();
+                createDraggableElement();
+                machine.current_job = null;
+                Object.entries(Resources).forEach(([key, val]) => {
+                    const resourceVal = document.getElementById(machine.id + "-" + key);
+                    resourceVal.innerText = 0;
+                });
+            } else {
+                job_element.draggable = false;
+                job_element.classList.add("pinned");
+                Object.entries(Resources).forEach(([key, val]) => {
+                    const resourceVal = document.getElementById(machine.id + "-" + key);
+                    resourceVal.innerText = Math.round(job.resources[machine.id][key]);
+                });
+            }
+        }
     });
+
+    game_state.score += score_earned;
+    game_state.allocation -= allocation_used;
+    game_state.total_energy += energy_used;
+    game_state.timeLeft -= advance_time;
+
     updateScore();
     updateProgressBar();
     updateTimer();
     updateEnergy();
-
-    round_state.score = 0;
-    document.getElementById('round-score-value').innerText = 0;
-    round_state.allocation = 0;
-    document.getElementById('round-cost-value').innerText = 0;
-    round_state.time = 0;
-    document.getElementById('round-time-value').innerText = 0;
-    round_state.energy = 0;
-    document.getElementById('round-energy-value').innerText = 0;
+    // updateRoundState();
 
     if(game_state.allocation <= 0 || game_state.timeLeft <= 0){
         gameOver();
@@ -129,30 +163,30 @@ function updateGameState() {
     return true;
 }
 
-function updateRoundState() {
-    let round_score = 0;
-    let round_time = 0;
-    let round_cost = 0;
-    let round_energy = 0;
+// function updateRoundState() {
+//     let round_score = 0;
+//     let round_time = 0;
+//     let round_cost = 0;
+//     let round_energy = 0;
 
-    Object.values(droppableList).forEach(machine => {
-        machine.current_jobs.forEach(job_id => {
-            const job = dataList[job_id];
-            round_score += job.score;
-            round_cost += job.resources[machine.id].cost;
-            round_energy += job.resources[machine.id].energy
-            round_time = Math.max(round_time, job.resources[machine.id].runtime);
-        });
-    });
-    round_state.score = round_score;
-    document.getElementById('round-score-value').innerText = round_score;
-    round_state.allocation = round_cost;
-    document.getElementById('round-cost-value').innerText = round_cost;
-    round_state.time = round_time;
-    document.getElementById('round-time-value').innerText = round_time;
-    round_state.energy = round_energy;
-    document.getElementById('round-energy-value').innerText = round_energy;
-}
+//     Object.values(droppableList).forEach(machine => {
+//         if(machine.current_job != null) {
+//             const job = dataList[machine.current_job];
+//             round_score += job.score;
+//             round_cost += job.resources[machine.id].cost;
+//             round_energy += job.resources[machine.id].energy;
+//             round_time = Math.max(round_time, job.resources[machine.id].runtime);
+//         }
+//     });
+//     round_state.score = round_score;
+//     document.getElementById('round-score-value').innerText = round_score;
+//     round_state.allocation = round_cost;
+//     document.getElementById('round-cost-value').innerText = round_cost;
+//     round_state.time = round_time;
+//     document.getElementById('round-time-value').innerText = round_time;
+//     round_state.energy = round_energy;
+//     document.getElementById('round-energy-value').innerText = round_energy;
+// }
 
 function dragStart(event) {
     event.dataTransfer.setData('text', event.target.id);
@@ -172,7 +206,7 @@ function drop(event) {
     const machine_element = event.currentTarget.parentElement;
     const machine = droppableList[machine_element.id];
     const draggableElement = document.getElementById(data);
-    if (machine.current_jobs.size == 0) {
+    if (machine.current_job == null) {
         // Append the draggable element to the droppable area
         event.target.appendChild(draggableElement);
 
@@ -184,17 +218,22 @@ function drop(event) {
 
         const job_id = data.split('-')[1];
         if ("current_machine" in dataList[job_id]){
-            droppableList[dataList[job_id]["current_machine"]].current_jobs.delete(job_id);
+            let machine_id = dataList[job_id]["current_machine"];
+            droppableList[machine_id].current_job = null;
+            Object.entries(Resources).forEach(([key, val]) => {
+                const resourceVal = document.getElementById(machine_id + "-" + key);
+                resourceVal.innerText = 0;
+            });
         }
-        machine.current_jobs.add(job_id);
+        machine.current_job = job_id;
         dataList[job_id]["current_machine"] = machine_element.id;
 
         Object.entries(Resources).forEach(([key, val]) => {
             const resourceVal = document.getElementById(machine.id + "-" + key);
-            resourceVal.innerText = "" + dataList[job_id].resources[machine.id][key];
+            resourceVal.innerText = Math.round(dataList[job_id].resources[machine.id][key]);
         });
 
-        updateRoundState();
+        // updateRoundState();
     }  else {
         // Provide feedback that dropping is not allowed
         console.log('Dropping not allowed in this area!');
@@ -205,6 +244,26 @@ function drop(event) {
             draggableElement.style.borderColor = ''; // Reset border color after a short delay
         }, 500); // Adjust the delay as needed (1000 milliseconds = 1 second)
     }
+}
+
+function dropTaskArea(event) {
+    console.log("Dropped task back in task area");
+    event.preventDefault();
+    const data = event.dataTransfer.getData('text');
+    const draggableElement = document.getElementById(data);
+    event.currentTarget.appendChild(draggableElement);
+    draggableElement.style.position = 'relative';
+
+    const job_id = data.split('-')[1];
+    if ("current_machine" in dataList[job_id]){
+        let machine_id = dataList[job_id]["current_machine"];
+        droppableList[machine_id].current_job = null;
+        Object.entries(Resources).forEach(([key, val]) => {
+            const resourceVal = document.getElementById(machine_id + "-" + key);
+            resourceVal.innerText = 0;
+        });
+    }
+    // updateRoundState();
 }
 
 function sendDataToServer(data) {
@@ -404,11 +463,14 @@ updateProgressBar();
 game_state.version = version;
 
 calculateCosts(cost_function);
+const taskArea = document.getElementById('task-area');
+taskArea.addEventListener('dragover', dragOver);
+taskArea.addEventListener('drop', dropTaskArea);
 createDroppableAreas();
+
 for(let i = 0; i < 5; i++){
     createDraggableElement();
 }
-// let taskInterval = setInterval(createDraggableElement, 10000);
-// Add event listeners
+
 advanceButton.addEventListener('click', advanceButtonClick);
 endGameButton.addEventListener('click', gameOver);

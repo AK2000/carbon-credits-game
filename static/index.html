@@ -18,9 +18,12 @@
             <h2>How to Play</h2>
             <p>
                 <ul>
-                    <li>Drag and drop a job into the "task" slot to assign a job to a machine</li>
+                    <li>Drag and drop a job into the "task" slot to assign a job to a machine.</li>
                     <li>Hover over a job to view the resources it uses.</li>
-                    <li>Hit the "Advance" button to run assigned jobs and advance the simulation</li>
+                    <li>Hit the "Advance" button to run assigned jobs and advance the simulation.</li>
+                    <li>Once a job starts you will not be able to move the job to a different machine.</li>
+                    <li>The game will end when you run out of time or allocation.</li>
+                    <li>If you cannot run anymore jobs but still have allocation/time remaining, hit "End Game" to end the game.</li>
                 </ul>
             </p>
         </div>
@@ -38,16 +41,17 @@
                     </div>
                     <div class="info-element" id="timer">Time Left: <span id="timer-value">200</span></div>
                     <div class="info-element energy-info" id="energy">Energy Used: <span id="energy-value">0</span></div>
+                    <div class="info-element" id="advance"><button id="advance-button">Advance</button></div>
                     <div class="info-element" id="end-game"><button id="end-game-button">End Game</button></div>
                 </div>
-                <div id="round-info">
+                <!-- <div id="round-info">
                     <div class="info-element" id="round-header"> Scheduled: </div>
                     <div class="info-element" id="round-score">Score:<span id="round-score-value">0</span></div>
                     <div class="info-element" id="round-cost"><span class="resource-icon cost-icon"></span> <span id="round-cost-value">0</span></div>
                     <div class="info-element" id="round-time"><span class="resource-icon time-icon"></span> <span id="round-time-value">0</span></div>
                     <div class="info-element energy-info" id="round-energy"><span class="resource-icon energy-icon"></span> <span id="round-energy-value">0</span></div>
                     <div class="info-element" id="advance"><button id="advance-button">Advance</button></div>
-                </div>
+                </div> -->
                 <div id="game-mechanics">
                     <div id="task-area">
                     </div>
