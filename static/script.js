@@ -17,9 +17,9 @@ function generateUniqueId() {
 
 const game_state = {
     score: 0,
-    timeLeft: 200,
-    total_allocation: 200,
-    allocation: 200,
+    timeLeft: 100,
+    total_allocation: 100,
+    allocation: 100,
     total_energy: 0,
     total_runtime: 0,
     scheduling_decisions: [],
@@ -77,7 +77,7 @@ function gameOver() {
     endGameButton.disabled = true;
     sendDataToServer(game_state);
     // Additional game over logic here if needed
-    alert('Game Over! Your final score is ' + game_state.score);
+    alert('Game Over! Your final score is ' + Math.round(game_state.score));
 }
 
 function updateGameState() {
@@ -289,7 +289,7 @@ function sendDataToServer(data) {
 
 function advanceButtonClick() {
     if(!updateGameState())
-        console.log("Can not run the current set of jobs!");
+        alert("Can not run the current set of jobs!");
 }
 
 function createDroppableAreas() {
@@ -360,7 +360,7 @@ function createDraggableElement() {
     const infoContainer = document.createElement('div');
     infoContainer.className = 'info-container';
     infoContainer.id = 'info-' + item.id;
-    infoContainer.innerText = "Job Resources: ";
+    infoContainer.innerText = textSpan.innerText;
     // draggableElement.appendChild(infoIcon);
     draggableElement.appendChild(infoContainer);
 
@@ -392,17 +392,13 @@ function createDraggableElement() {
             infoContainer.style.display = 'block';
         }
     });
-
-    // textSpan.addEventListener('touchstart', function(event) {
-    //     infoContainer.style.display = 'block';
-    // });
+    draggableElement.addEventListener('click', function(event) {
+        infoContainer.style.display = 'none';
+    });
 
     draggableElement.addEventListener('mouseout', function(event) {
         infoContainer.style.display = 'none';
     });
-    // draggableElement.addEventListener('touchend', function(event) {
-    //     infoContainer.style.display = 'none';
-    // });
 
     // Add drag start event listener
     draggableElement.addEventListener('dragstart', dragStart);

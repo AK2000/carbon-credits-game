@@ -18,12 +18,21 @@
             <h2>How to Play</h2>
             <p>
                 <ul>
-                    <li>Drag and drop a job into the "task" slot to assign a job to a machine.</li>
                     <li>Hover over a job to view the resources it uses.</li>
+                    <li>Drag and drop a job into the "task" slot to assign a job to a machine.</li>
                     <li>Hit the "Advance" button to start running the assigned jobs and advance the simulation.</li>
+                    <li>Not all machines must be assigned a task before pressing "Advance".</li>
                     <li>Once a job starts you will not be able to move the job to a different machine.</li>
                     <li>The game will end when you run out of time or allocation.</li>
                     <li>If you cannot run anymore jobs but still have allocation/time remaining, hit "End Game" to end the game.</li>
+                </ul>
+            </p>
+            <h2>Glossary</h2>
+            <p>
+                <ul>
+                    <li><span class="resource-icon cost-icon"></span>: Cost</li>
+                    <li><span class="resource-icon time-icon"></span>: Time</li>
+                    <li class="energy-info"><span class="resource-icon energy-icon"></span>: Energy</li>
                 </ul>
             </p>
         </div>
@@ -39,7 +48,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="info-element" id="timer">Time Left: <span id="timer-value">200</span></div>
+                    <div class="info-element" id="timer">Time Left: <span id="timer-value">100</span></div>
                     <div class="info-element energy-info" id="energy">Energy Used: <span id="energy-value">0</span></div>
                     <div class="info-element" id="advance"><button id="advance-button">Advance</button></div>
                     <div class="info-element" id="end-game"><button id="end-game-button">End Game</button></div>
