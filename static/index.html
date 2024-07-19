@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Core Hours and Carbon Credits Game</title>
+    <title>HPC Scheduling Game</title>
     <link rel="stylesheet" href="styles.css"> <!-- Optional: CSS file for styling -->
 </head>
 <body>
     <div class="container">
-        <h1>Carbon Credits Scheduling Game<span class="eco-icon"></span></h1>
+        <h1>HPC Scheduling Game</h1>
         <div class="instructions">
             <h2>Objective</h2>
             <p>
@@ -25,6 +25,8 @@
                     <li>Once a job starts you will not be able to move the job to a different machine.</li>
                     <li>The game will end when you run out of time or allocation.</li>
                     <li>If you cannot run anymore jobs but still have allocation/time remaining, hit "End Game" to end the game.</li>
+                    <li>Refresh the page to play again.</li>
+                    <li><b>Please play the game at least twice!</b> The first time will be to get a sense of the problem and mechanics. The second try (and more if you'd like) will be used for the study.</li>
                 </ul>
             </p>
             <h2>Glossary</h2>
@@ -41,15 +43,16 @@
                 <div id="game-info">
                     <div class="info-element" id="score">Score: <span id="score-value">0</span></div>
                     <div class="info-element" id="progress-bar-container">
-                        Allocation:
+                        Allocation 
+                        <span class="resource-icon cost-icon"></span>:
                         <div id="progress-bar">
                             <div id="progress-bar-inner">
                                 <span id="progress-bar-label"></span>
                             </div>
                         </div>
                     </div>
-                    <div class="info-element" id="timer">Time Left: <span id="timer-value">100</span></div>
-                    <div class="info-element energy-info" id="energy">Energy Used: <span id="energy-value">0</span></div>
+                    <div class="info-element" id="timer">Time Left <span class="resource-icon time-icon"></span>: <span id="timer-value">100</span></div>
+                    <div class="info-element energy-info" id="energy">Energy Used <span class="resource-icon energy-icon"></span>: <span id="energy-value">0</span></div>
                     <div class="info-element" id="advance"><button id="advance-button">Advance</button></div>
                     <div class="info-element" id="end-game"><button id="end-game-button">End Game</button></div>
                 </div>

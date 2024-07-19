@@ -98,20 +98,24 @@ h1 {
 }
 
 #game-info .info-element {
-    flex: 1;
     text-align: center;
     font-weight: bold;
 }
 
 #round-info .info-element {
-    flex: 1;
     text-align: center;
     font-weight: bold;
 }
 
 #game-info #progress-bar-container {
-    margin-bottom: 10px;
-    flex: 2;
+    flex-basis: 30%;
+}
+
+.emphasis-border {
+    border: 2px solid #3498db; /* Border width and color */
+    padding: 10px; /* Padding inside the border */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Shadow for emphasis */
 }
 
 #progress-bar {
@@ -161,6 +165,11 @@ h1 {
 .job {
     display: flex;
     justify-content: center;
+}
+
+.job span {
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 .job-info {

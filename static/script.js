@@ -9,6 +9,9 @@ const progressBarLabel = document.getElementById('progress-bar-label');
 const timerValue = document.getElementById('timer-value');
 const energyValue = document.getElementById('energy-value');
 
+advanceButton.addEventListener('click', advanceButtonClick);
+endGameButton.addEventListener('click', gameOver);
+
 function generateUniqueId() {
     let array = new Uint32Array(1);
     window.crypto.getRandomValues(array);
@@ -24,7 +27,8 @@ const game_state = {
     total_runtime: 0,
     scheduling_decisions: [],
     game_id: generateUniqueId(),
-    job_idx: 0
+    job_idx: 0,
+    visits: 0
 };
 
 const round_state = {
@@ -51,6 +55,47 @@ const Resources = {
     runtime: {text: "Time", iconClass: "time-icon"},
     cost: {text: "Cost", iconClass: "cost-icon"}
 }
+
+function setCookie(cookieName, cookieValue, expirationDays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
+    var expires = "expires=" + d.toUTCString();
+    document.cookie = cookieName + "=" + cookieValue + ";" + expires + ";path=/";
+}
+
+// Function to get the value of a cookie
+function getCookie(cookieName) {
+    var name = cookieName + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var cookieArray = decodedCookie.split(';');
+    for (var i = 0; i < cookieArray.length; i++) {
+        var cookie = cookieArray[i];
+        while (cookie.charAt(0) === ' ') {
+            cookie = cookie.substring(1);
+        }
+        if (cookie.indexOf(name) === 0) {
+            return cookie.substring(name.length, cookie.length);
+        }
+    }
+    return "";
+}
+
+// Function to track visits
+function trackVisits() {
+    var visitCount = getCookie("visitCount");
+    if (visitCount === "") {
+        // If the cookie doesn't exist, this is the user's first visit
+        visitCount = 1;
+    } else {
+        // If the cookie exists, increment the visit count
+        visitCount = parseInt(visitCount) + 1;
+    }
+    // Update the cookie with the new visit count
+    setCookie("visitCount", visitCount, 30); // Cookie expires in 30 days
+
+    return visitCount;
+}
+
 
 function updateTimer() {
     timerValue.textContent = game_state.timeLeft;
@@ -345,7 +390,7 @@ function createDraggableElement() {
 
     const draggableElement = document.createElement('div');
     const textSpan = document.createElement('span');
-    textSpan.innerText = item.text + ' ' + "Score: " + item.score;
+    textSpan.innerHTML = "<span>" + item.text + "</span> <span> Score: " + item.score + "</span>";
     draggableElement.appendChild(textSpan);
     draggableElement.classList.add('draggable', 'job');
     draggableElement.draggable = true;
@@ -360,7 +405,7 @@ function createDraggableElement() {
     const infoContainer = document.createElement('div');
     infoContainer.className = 'info-container';
     infoContainer.id = 'info-' + item.id;
-    infoContainer.innerText = textSpan.innerText;
+    infoContainer.innerHTML = textSpan.innerHTML;
     // draggableElement.appendChild(infoIcon);
     draggableElement.appendChild(infoContainer);
 
@@ -423,54 +468,64 @@ function initializeJobs(cost_function) {
     });
 }
 
-// Define a variable to hold the function pointer
-let cost_function;
 
-// Get the URL parameters
-const urlParams = new URLSearchParams(window.location.search);
-let version = urlParams.get('version');
+function initialize() {
+    // Call the trackVisits function when the page loads
+    game_state.visits = trackVisits();
 
-// Array of available game versions
-const availableVersions = ['1', '2', '3']; // Add more versions as needed
+    console.log("Number of visits: ", game_state.visits);
 
-// If version is not specified or is invalid, choose a random version
-if (!version || !availableVersions.includes(version)) {
-    version = availableVersions[Math.floor(Math.random() * availableVersions.length)];
+    // Define a variable to hold the function pointer
+    let cost_function;
+
+    // Get the URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    let version = urlParams.get('version');
+
+    // Array of available game versions
+    const availableVersions = ['1', '2', '3']; // Add more versions as needed
+
+    // If version is not specified or is invalid, choose a random version
+    if (!version || !availableVersions.includes(version)) {
+        if(game_state.visits == 1){
+            version = '1';
+        } else {
+            version = availableVersions[Math.floor(Math.random() * availableVersions.length)];
+        }
+    }
+
+    // Assign the function pointer based on the version
+    switch (version) {
+        case '1':
+            const style = document.createElement('style');
+            document.head.appendChild(style);
+            style.sheet.insertRule('.energy-info { display: none; }', 0);
+            cost_function = traditionalCostFormula;
+            break;
+        case '2':
+            cost_function = traditionalCostFormula;
+            break;
+        case '3':
+            cost_function = energyCostFormula;
+            game_state.total_allocation = 1400;
+            game_state.allocation = game_state.total_allocation;
+            break;
+        default:
+            console.log("An Error ocurred initializing the game!");
+            break;
+    }
+    updateProgressBar();
+    game_state.version = version;
+
+    initializeJobs(cost_function);
+    const taskArea = document.getElementById('task-area');
+    taskArea.addEventListener('dragover', dragOver);
+    taskArea.addEventListener('drop', dropTaskArea);
+    createDroppableAreas();
+
+    for(let i = 0; i < 5; i++){
+        createDraggableElement();
+    }
 }
 
-// Assign the function pointer based on the version
-switch (version) {
-    case '1':
-        const style = document.createElement('style');
-        document.head.appendChild(style);
-        style.sheet.insertRule('.energy-info { display: none; }', 0);
-        cost_function = traditionalCostFormula;
-        break;
-    case '2':
-        cost_function = traditionalCostFormula;
-        break;
-    case '3':
-        cost_function = energyCostFormula;
-        game_state.total_allocation = 1400;
-        game_state.allocation = game_state.total_allocation;
-        break;
-    default:
-        console.log("An Error ocurred initializing the game!");
-        break;
-}
-updateProgressBar();
-
-game_state.version = version;
-
-initializeJobs(cost_function);
-const taskArea = document.getElementById('task-area');
-taskArea.addEventListener('dragover', dragOver);
-taskArea.addEventListener('drop', dropTaskArea);
-createDroppableAreas();
-
-for(let i = 0; i < 5; i++){
-    createDraggableElement();
-}
-
-advanceButton.addEventListener('click', advanceButtonClick);
-endGameButton.addEventListener('click', gameOver);
+initialize();
