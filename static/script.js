@@ -3,7 +3,7 @@
 // Select elements
 const advanceButton = document.getElementById('advance-button');
 const endGameButton = document.getElementById('end-game-button')
-const scoreValue = document.getElementById('score-value');
+const completedValue = document.getElementById('completed-value');
 const progressBar = document.getElementById('progress-bar-inner');
 const progressBarLabel = document.getElementById('progress-bar-label');
 const timerValue = document.getElementById('timer-value');
@@ -19,23 +19,20 @@ function generateUniqueId() {
 }
 
 const game_state = {
-    score: 0,
+    jobs_completed: 0,
     timeLeft: 100,
     total_allocation: 100,
     allocation: 100,
     total_energy: 0,
     total_runtime: 0,
     scheduling_decisions: [],
-    game_id: generateUniqueId(),
     job_idx: 0,
-    visits: 0
-};
-
-const round_state = {
-    score: 0,
-    time: 0,
-    allocation: 0,
-    energy: 0
+    userID: "",
+    plays: 0,
+    visits: 0,
+    group: 0,
+    startTime: Date.now(),
+    gameTime: 0,
 };
 
 const dataList = await fetch('./sample_jobs.json')
@@ -55,6 +52,15 @@ const Resources = {
     runtime: {text: "Time", iconClass: "time-icon"},
     cost: {text: "Cost", iconClass: "cost-icon"}
 }
+
+const treatmentGroups = [
+    ['1', '1', '2'],
+    ['2', '2', '1'],
+    ['1', '1', '3'],
+    ['3', '3', '1'],
+    ['2', '2', '3'],
+    ['3', '3', '2']
+]
 
 function setCookie(cookieName, cookieValue, expirationDays) {
     var d = new Date();
@@ -80,20 +86,40 @@ function getCookie(cookieName) {
     return "";
 }
 
-// Function to track visits
+function trackUser() {
+    var group  = 0;
+    var userID = getCookie("userID");
+    if (userID  === "") {
+        userID = generateUniqueId();
+        group = Math.floor(Math.random() * treatmentGroups.length);
+
+        setCookie("userID", userID, 30);
+        setCookie("treatmentGroup", group, 30);
+    } else {
+        group = getCookie("treatmentGroup");
+    }
+    console.log("User: ", userID, "Treatment Group: ", group);
+    return {"id": userID, "group": group};
+}
+
 function trackVisits() {
     var visitCount = getCookie("visitCount");
     if (visitCount === "") {
-        // If the cookie doesn't exist, this is the user's first visit
         visitCount = 1;
     } else {
-        // If the cookie exists, increment the visit count
         visitCount = parseInt(visitCount) + 1;
     }
-    // Update the cookie with the new visit count
-    setCookie("visitCount", visitCount, 30); // Cookie expires in 30 days
+    setCookie("visitCount", visitCount, 30);
 
     return visitCount;
+}
+
+function getPlays() {
+    var playCount = getCookie("playCount");
+    if (playCount === "") {
+        playCount = 0;
+    } 
+    return playCount;
 }
 
 
@@ -101,18 +127,16 @@ function updateTimer() {
     timerValue.textContent = game_state.timeLeft;
 }
 
-// Score and progress bar functions
-function updateScore() {
-    scoreValue.textContent = Math.round(game_state.score);
+function updateCompleted() {
+    completedValue.textContent = Math.round(game_state.jobs_completed);
 }
 
-// Score and progress bar functions
 function updateEnergy() {
     energyValue.textContent = Math.round(game_state.total_energy);
 }
 
 function updateProgressBar() {
-    const percent = (game_state.allocation / game_state.total_allocation) * 100; // Example: Update progress bar based on score
+    const percent = (game_state.allocation / game_state.total_allocation) * 100;
     progressBar.style.width = percent + '%';
     progressBarLabel.innerText = Math.round(game_state.allocation);
 }
@@ -120,9 +144,10 @@ function updateProgressBar() {
 function gameOver() {
     advanceButton.disabled = true; // Disable the advance button
     endGameButton.disabled = true;
+    game_state.plays += 1;
+    setCookie("playCount", game_state.plays, 30); 
     sendDataToServer(game_state);
-    // Additional game over logic here if needed
-    alert('Game Over! Your final score is ' + Math.round(game_state.score));
+    alert('Game Over! You completed ' + Math.round(game_state.jobs_completed)) + ' jobs!';
 }
 
 function updateGameState() {
@@ -139,15 +164,15 @@ function updateGameState() {
     });
     console.log(advance_time);
 
-    // Find allocation and score
+    // Find allocation and jobs completed
     let allocation_used = 0;
     let energy_used = 0
-    let score_earned = 0;
+    let jobs_completed = 0;
     Object.values(droppableList).forEach(machine => {
         if(machine.current_job != null) {
             const job = dataList[machine.current_job];
-            if(advance_time == job.resources[machine.id].runtime){
-                score_earned += job.score;
+            if(advance_time >= job.resources[machine.id].runtime){
+                jobs_completed += 1
             }
             
             const job_proportion = advance_time/job.resources[machine.id].runtime;
@@ -191,12 +216,13 @@ function updateGameState() {
         }
     });
 
-    game_state.score += score_earned;
+    game_state.jobs_completed += jobs_completed;
     game_state.allocation -= allocation_used;
     game_state.total_energy += energy_used;
     game_state.timeLeft -= advance_time;
+    game_state.gameTime = Date.now() - game_state.startTime;
 
-    updateScore();
+    updateCompleted();
     updateProgressBar();
     updateTimer();
     updateEnergy();
@@ -208,31 +234,6 @@ function updateGameState() {
 
     return true;
 }
-
-// function updateRoundState() {
-//     let round_score = 0;
-//     let round_time = 0;
-//     let round_cost = 0;
-//     let round_energy = 0;
-
-//     Object.values(droppableList).forEach(machine => {
-//         if(machine.current_job != null) {
-//             const job = dataList[machine.current_job];
-//             round_score += job.score;
-//             round_cost += job.resources[machine.id].cost;
-//             round_energy += job.resources[machine.id].energy;
-//             round_time = Math.max(round_time, job.resources[machine.id].runtime);
-//         }
-//     });
-//     round_state.score = round_score;
-//     document.getElementById('round-score-value').innerText = round_score;
-//     round_state.allocation = round_cost;
-//     document.getElementById('round-cost-value').innerText = round_cost;
-//     round_state.time = round_time;
-//     document.getElementById('round-time-value').innerText = round_time;
-//     round_state.energy = round_energy;
-//     document.getElementById('round-energy-value').innerText = round_energy;
-// }
 
 function dragStart(event) {
     event.dataTransfer.setData('text', event.target.id);
@@ -390,7 +391,8 @@ function createDraggableElement() {
 
     const draggableElement = document.createElement('div');
     const textSpan = document.createElement('span');
-    textSpan.innerHTML = "<span>" + item.text + "</span> <span> Score: " + item.score + "</span>";
+    textSpan.innerText = item.text;
+    textSpan.classList.add("job-title", item.importance.replace(" ", "-"));
     draggableElement.appendChild(textSpan);
     draggableElement.classList.add('draggable', 'job');
     draggableElement.draggable = true;
@@ -405,7 +407,7 @@ function createDraggableElement() {
     const infoContainer = document.createElement('div');
     infoContainer.className = 'info-container';
     infoContainer.id = 'info-' + item.id;
-    infoContainer.innerHTML = textSpan.innerHTML;
+    infoContainer.innerHTML = "<span>" + item.text + "</span> <span class=\"" + item.importance.replace(" ", "-") + "\"> Importance: " + item.importance + "</span>";
     // draggableElement.appendChild(infoIcon);
     draggableElement.appendChild(infoContainer);
 
@@ -471,7 +473,11 @@ function initializeJobs(cost_function) {
 
 function initialize() {
     // Call the trackVisits function when the page loads
+    const user = trackUser();
+    game_state.userID = user["id"];
+    game_state.group = user["group"];
     game_state.visits = trackVisits();
+    game_state.plays = getPlays();
 
     console.log("Number of visits: ", game_state.visits);
 
@@ -487,11 +493,7 @@ function initialize() {
 
     // If version is not specified or is invalid, choose a random version
     if (!version || !availableVersions.includes(version)) {
-        if(game_state.visits == 1){
-            version = '1';
-        } else {
-            version = availableVersions[Math.floor(Math.random() * availableVersions.length)];
-        }
+        version = treatmentGroups[game_state.group][game_state.plays % treatmentGroups[game_state.group].length];
     }
 
     // Assign the function pointer based on the version

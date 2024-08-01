@@ -12,8 +12,9 @@
         <div class="instructions">
             <h2>Objective</h2>
             <p>
-                Welcome to the carbon credits scheduling game! You are a computational scientist that has many jobs to run, but need to finish all of the jobs within 60 hours, without using up all of your allocation. 
-                Luckily, you have access to four different machines to run the jobs. Your task is determine which machine to submit each job to in order to obtain the highest "score" within the time and allocation. Happy computing!
+                Welcome to the HPC scheduling game! You are a computational scientist that has many jobs to run, but need to finish all of the jobs within 100 hours, without exceeding your allocation. 
+                Luckily, you have access to four different machines to run the jobs. Your task is to determine to which machine to submit each job. 
+                The jobs currently available are shown as green boxes; more jobs will become available as you run the current jobs. Happy computing!
             </p>
             <h2>How to Play</h2>
             <p>
@@ -41,7 +42,7 @@
         <div id="game-container">
             <div id="game-box">
                 <div id="game-info">
-                    <div class="info-element" id="score">Score: <span id="score-value">0</span></div>
+                    <div class="info-element" id="jobs-completed">Jobs Completed: <span id="completed-value">0</span></div>
                     <div class="info-element" id="progress-bar-container">
                         Allocation 
                         <span class="resource-icon cost-icon"></span>:

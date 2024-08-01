@@ -291,3 +291,23 @@ h1 {
     flex: 1;
     text-align: center;
 }
+
+.job .job-title {
+    font-weight: bold;
+}
+
+.job .low {
+    color:#195c89;
+}
+
+.job .medium {
+    color: #d2d748;
+}
+
+.job .high {
+    color: #f0ae09;
+}
+
+.job .very-high {
+    color: #f00909;
+}
