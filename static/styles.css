@@ -85,11 +85,17 @@ h1 {
     text-align: center;
 }
 
-#game-info, #round-info, #game-mechanics {
+#game-info, #game-mechanics {
     display: flex;
     justify-content: space-between;
     align-items: center;
     
+}
+
+#game-controls {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 }
 
 #game-mechanics {
@@ -102,7 +108,7 @@ h1 {
     font-weight: bold;
 }
 
-#round-info .info-element {
+#game-controls .info-element {
     text-align: center;
     font-weight: bold;
 }
@@ -234,7 +240,7 @@ h1 {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     color: #000;
     z-index: 100;
-    min-width: 400px;
+    min-width: 450px;
     pointer-events:none;
 
     position: absolute;
@@ -310,4 +316,9 @@ h1 {
 
 .job .very-high {
     color: #f00909;
+}
+
+button {
+    font-size: 14px;
+    padding: 3px;
 }

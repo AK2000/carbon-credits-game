@@ -2,7 +2,8 @@
 
 // Select elements
 const advanceButton = document.getElementById('advance-button');
-const endGameButton = document.getElementById('end-game-button')
+const endGameButton = document.getElementById('end-game-button');
+const newGameButton = document.getElementById('new-game-button');
 const completedValue = document.getElementById('completed-value');
 const progressBar = document.getElementById('progress-bar-inner');
 const progressBarLabel = document.getElementById('progress-bar-label');
@@ -11,6 +12,8 @@ const energyValue = document.getElementById('energy-value');
 
 advanceButton.addEventListener('click', advanceButtonClick);
 endGameButton.addEventListener('click', gameOver);
+newGameButton.addEventListener('click', newGame);
+
 
 function generateUniqueId() {
     let array = new Uint32Array(1);
@@ -25,7 +28,7 @@ const game_state = {
     allocation: 100,
     total_energy: 0,
     total_runtime: 0,
-    scheduling_decisions: [],
+    scheduling_decisions: {},
     job_idx: 0,
     userID: "",
     plays: 0,
@@ -96,7 +99,7 @@ function trackUser() {
         setCookie("userID", userID, 30);
         setCookie("treatmentGroup", group, 30);
     } else {
-        group = getCookie("treatmentGroup");
+        group = parseInt(getCookie("treatmentGroup"));
     }
     console.log("User: ", userID, "Treatment Group: ", group);
     return {"id": userID, "group": group};
@@ -118,7 +121,9 @@ function getPlays() {
     var playCount = getCookie("playCount");
     if (playCount === "") {
         playCount = 0;
-    } 
+    } else {
+	playCount = parseInt(playCount);
+    }
     return playCount;
 }
 
@@ -141,13 +146,19 @@ function updateProgressBar() {
     progressBarLabel.innerText = Math.round(game_state.allocation);
 }
 
+
+function newGame() {
+    location.reload();
+}
+
 function gameOver() {
     advanceButton.disabled = true; // Disable the advance button
     endGameButton.disabled = true;
+    newGameButton.disabled = false;
     game_state.plays += 1;
     setCookie("playCount", game_state.plays, 30); 
     sendDataToServer(game_state);
-    alert('Game Over! You completed ' + Math.round(game_state.jobs_completed)) + ' jobs!';
+    alert('Game Over! You completed ' + Math.round(game_state.jobs_completed) + ' jobs!');
 }
 
 function updateGameState() {
@@ -186,14 +197,17 @@ function updateGameState() {
         return false;
     }
 
+    let scheduling_decisions = {}
     Object.values(droppableList).forEach(machine => {
         if(machine.current_job != null) {
             const job = dataList[machine.current_job];
             const job_proportion = advance_time/job.resources[machine.id].runtime;
+	    scheduling_decisions[machine.id] = [machine.current_job, job_proportion];
+
             job.resources[machine.id].runtime -= advance_time;
+	    game_state.total_runtime += advance_time;
             job.resources[machine.id].cost = (1-job_proportion) * job.resources[machine.id].cost;
             job.resources[machine.id].energy = (1-job_proportion) * job.resources[machine.id].energy;
-            game_state.scheduling_decisions.push(job);    
 
             const job_element = document.getElementById('item-' + machine.current_job);
             if(job.resources[machine.id].runtime == 0){
@@ -219,6 +233,7 @@ function updateGameState() {
     game_state.jobs_completed += jobs_completed;
     game_state.allocation -= allocation_used;
     game_state.total_energy += energy_used;
+    game_state.scheduling_decisions[game_state.timeLeft] = scheduling_decisions;
     game_state.timeLeft -= advance_time;
     game_state.gameTime = Date.now() - game_state.startTime;
 
@@ -391,8 +406,8 @@ function createDraggableElement() {
 
     const draggableElement = document.createElement('div');
     const textSpan = document.createElement('span');
-    textSpan.innerText = item.text;
-    textSpan.classList.add("job-title", item.importance.replace(" ", "-"));
+    textSpan.innerHTML = "<span>" +  item.text + "</span> <span class=\"" + item.importance.replace(" ", "-") + "\"> (Priority: " + item.importance + ")</span>"
+    textSpan.classList.add("job-title");
     draggableElement.appendChild(textSpan);
     draggableElement.classList.add('draggable', 'job');
     draggableElement.draggable = true;
@@ -407,7 +422,7 @@ function createDraggableElement() {
     const infoContainer = document.createElement('div');
     infoContainer.className = 'info-container';
     infoContainer.id = 'info-' + item.id;
-    infoContainer.innerHTML = "<span>" + item.text + "</span> <span class=\"" + item.importance.replace(" ", "-") + "\"> Importance: " + item.importance + "</span>";
+    infoContainer.innerHTML = "<span>" + item.text + "</span> <span class=\"" + item.importance.replace(" ", "-") + "\"> Priority: " + item.importance + "</span>";
     // draggableElement.appendChild(infoIcon);
     draggableElement.appendChild(infoContainer);
 
@@ -426,7 +441,7 @@ function createDraggableElement() {
             icon.classList.add("resource-icon", Resources[key].iconClass);
             infoItem.appendChild(icon);
 
-            infoItem.innerHTML += ": " + val;
+            infoItem.innerHTML += ": " + parseFloat(val.toFixed(1));
             infoItem.classList.add("info-item", key + "-info");
             info.appendChild(infoItem);
         });

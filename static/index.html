@@ -26,8 +26,7 @@
                     <li>Once a job starts you will not be able to move the job to a different machine.</li>
                     <li>The game will end when you run out of time or allocation.</li>
                     <li>If you cannot run anymore jobs but still have allocation/time remaining, hit "End Game" to end the game.</li>
-                    <li>Refresh the page to play again.</li>
-                    <li><b>Please play the game at least twice!</b> The first time will be to get a sense of the problem and mechanics. The second try (and more if you'd like) will be used for the study.</li>
+                    <li><b>Please play the game (at least) three times!</b> The first time will be to get a sense of the problem and mechanics -- you do not have to finish the game once you get a sense of how it works. The second and third will be used for the study.</li>
                 </ul>
             </p>
             <h2>Glossary</h2>
@@ -54,8 +53,11 @@
                     </div>
                     <div class="info-element" id="timer">Time Left <span class="resource-icon time-icon"></span>: <span id="timer-value">100</span></div>
                     <div class="info-element energy-info" id="energy">Energy Used <span class="resource-icon energy-icon"></span>: <span id="energy-value">0</span></div>
-                    <div class="info-element" id="advance"><button id="advance-button">Advance</button></div>
-                    <div class="info-element" id="end-game"><button id="end-game-button">End Game</button></div>
+		</div>
+	        <div id="game-controls">
+                    <div class="info-element" id="advance"><button id="advance-button" autocomplete="off">Advance</button></div>
+                    <div class="info-element" id="end-game"><button id="end-game-button" autocomplete="off">End Game</button></div>
+		    <div class="info-element" id="new-game"><button id="new-game-button" disabled autocomplete="off">New Game</button></div>
                 </div>
                 <!-- <div id="round-info">
                     <div class="info-element" id="round-header"> Scheduled: </div>
